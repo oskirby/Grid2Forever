@@ -21,6 +21,7 @@ local LoadAddOn = C_AddOns and C_AddOns.LoadAddOn or LoadAddOn
 local versionToc = GetAddOnMetadata("Grid2","Version")
 local versionCli = select(4,GetBuildInfo())
 Grid2.versionCli = versionCli
+Grid2.isForever = versionCli>=16000 and versionCli < 20000
 Grid2.isDevelop = versionToc=='\@project-version\@'
 Grid2.versionstring = "Grid2 v"..(Grid2.isDevelop and 'Dev' or versionToc)
 
@@ -146,7 +147,11 @@ end
 
 function Grid2:OnEnable()
 
-	if Grid2.versionCli<120001 then
+	if Grid2.isForever and Grid2.versionCli<16001 then
+		print("Grid2 Error: This Beta version is only compatible with WoW Forever Patch 1.60.1 or superior. Install a Grid2 stable version compatible with your game client.!!!")
+		return
+	end
+	if not Grid2.isForever and Grid2.versionCli<120001 then
 		print("Grid2 Error: This Beta version is only compatible with WoW Midnight Path 12.0.1 or superior. Install a Grid2 stable version compatible with your game client.!!!")
 		return
 	end
