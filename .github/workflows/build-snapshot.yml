@@ -1,0 +1,35 @@
+name: Build Grid2 Snapshot
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_TAG: ${{ github.event_name == 'pull_request' && format('pr{0}', github.event.pull_request.number) || 'snapshot' }}
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 200
+
+      - name: Build Snapshot Package
+        if: ${{ github.event_name == 'push' || inputs.retailtest }}
+        uses: BigWigsMods/packager@master
+        with:
+          args: -g retail -m .pkgmeta-retail -r ${{ github.workspace }}/release -n "{package-name}-${BUILD_TAG}-{project-version}{nolib}{classic}"
+        env:
+          GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v7
+        with:
+          path: 'release/*.zip'
+          if-no-files-found: 'error'
+          retention-days: 90
+          archive: false
